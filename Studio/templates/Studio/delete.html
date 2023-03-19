@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+</head>
+
+<body>
+	<p>Are you sure you want to delete <b>"{{photo}}"</b> ?</p> <img src="{{photo.images.url}}" alt="Smiley face" width="50%" height="50%" />
+	<form method="POST" action=""> {% csrf_token %}
+		<button type="submit" name="cancle"><a href="{% url 'dashboard' %}">Cancle</a></button>
+		<button type="submit" name="confirm">Delete</button>
+	</form>
+</body>
+
+</html>

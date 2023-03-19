@@ -1503,21 +1503,21 @@ ol {
 }
 
 .copyright {
-	border-top: 1px solid rgba(183, 183, 183, 0.2);
 	padding: 25px 0;
 	margin-top: 60px;
 }
 
 .copyright__text p {
 	margin-bottom: 0;
+	color: #70707009;
 }
 
 .copyright__text p i {
-	color: #dfa667;
+	color: #70707009;
 }
 
 .copyright__text p a {
-	color: #ffffff;
+	color: #70707009;
 }
 
 .copyright__widget {
@@ -1526,7 +1526,7 @@ ol {
 
 .copyright__widget a {
 	font-size: 14px;
-	color: #707070;
+	color: #70707009;
 	margin-right: 36px;
 	position: relative;
 }
