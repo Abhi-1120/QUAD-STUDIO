@@ -2,21 +2,34 @@ from django.shortcuts import render, redirect
 from Studio.models import *
 from .forms import ImageForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 
 
 def LoginPage(request):
-    return render(request, "Studio/sign-in.html")
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('/dashboard')
+        else:
+            messages.info(request, "Username or Password is incorrect.")
+    return render(request, "Studio/login.html")
 
 
-def RegisterPage(request):
-    return render(request, "Studio/sign-up.html")
+@login_required
+def logoutPage(request):
+    logout(request)
+    return redirect('/login')
 
 
-@login_required(redirect_field_name='login')
+@login_required
 def Add(request):
     categories = Category.objects.all()
     if request.method == 'POST':
         data = request.POST
+        flag = ImageForm(request.POST)
         images = request.FILES.getlist('images')
         if data['category'] != 'none':
             category = Category.objects.get(id=data['category'])
@@ -29,9 +42,11 @@ def Add(request):
             photo = Photo.objects.create(
                 category=category,
                 title=data['title'],
+                project_name=data['project_name'],
+                main=flag['main'].data,
                 images=image,
             )
-    context = {'categories': categories, 'photo': photo}
+    context = {'categories': categories}
     return render(request, 'Studio/add.html', context)
 
 
@@ -45,11 +60,14 @@ def Index(request):
     params = {'categories': categories, 'photos': photos}
     return render(request, "Studio/index.html", params)
 
+
 def About(request):
     return render(request, "Studio/about.html")
 
+
 def Services(request):
     return render(request, "Studio/services.html")
+
 
 def Projects(request):
     category = request.GET.get('category')
@@ -68,12 +86,14 @@ def ProjectDetails(request, project_name):
     return render(request, "Studio/blog-details.html", context)
 
 
+@login_required
 def Dashboard(request):
     photo = Photo.objects.all()
     params = {'photo': photo}
     return render(request, 'Studio/dashboard.html', params)
 
 
+@login_required
 def Delete(request, pk):
     photo = Photo.objects.get(id=pk)
     if request.method == 'POST':
@@ -83,15 +103,17 @@ def Delete(request, pk):
     return render(request, 'Studio/delete.html', context)
 
 
+@login_required
 def Update(request, pk):
     photo = Photo.objects.get(id=pk)
     form = ImageForm(instance=photo)
+    image = ImageForm(request.POST, request.FILES)
     if request.method == 'POST':
         form = ImageForm(request.POST, request.FILES, instance=photo)
         if form.is_valid():
             form.save()
             return redirect('/dashboard')
-    context = {'form': form, 'photo': photo}
+    context = {'form': form, 'photo': photo, 'image': image}
     return render(request, 'Studio/update.html', context)
 
 
